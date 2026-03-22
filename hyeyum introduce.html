@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>혜윰고등학교</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Gmarket+Sans:wght@300;500;700&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    :root {
+      --school-blue: #3b6dbf;
+      --school-blue-light: #5b8ee0;
+      --school-blue-dark: #2a4d8e;
+      --school-green: #4caf7d;
+      --school-bg: #f4f7fc;
+      --school-card: #ffffff;
+      --school-text: #2c3e50;
+      --school-text-light: #6b7c93;
+      --school-border: #dde4ef;
+      --school-accent: #e8703a;
+      --radius: 18px;
+      --radius-sm: 10px;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--school-bg);
+      color: var(--school-text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    #page-school { display: block; }
+    #page-cyber  { display: none; }
+
+    /* ===== TOGGLE ===== */
+    .mode-toggle-wrap {
+      position: fixed; top: 20px; right: 24px; z-index: 9999;
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(12px);
+      border: 1.5px solid var(--school-border);
+      border-radius: 50px; padding: 8px 16px;
+      box-shadow: 0 4px 18px rgba(59,109,191,0.1);
+      transition: all 0.35s; cursor: pointer; user-select: none;
+    }
+    .mode-toggle-wrap:hover { box-shadow: 0 4px 24px rgba(59,109,191,0.22); }
+    .mode-label {
+      font-family: 'Gmarket Sans', sans-serif;
+      font-size: 11px; font-weight: 500;
+      color: var(--school-text-light);
+      letter-spacing: 0.03em; transition: color 0.3s;
+    }
+    .toggle-track {
+      width: 44px; height: 24px;
+      background: #d0d9e8; border-radius: 50px;
+      position: relative; transition: background 0.4s;
+    }
+    .toggle-track.active { background: #00ffe7; box-shadow: 0 0 10px #00ffe755; }
+    .toggle-thumb {
+      width: 18px; height: 18px; background: #fff; border-radius: 50%;
+      position: absolute; top: 3px; left: 3px;
+      transition: transform 0.4s cubic-bezier(.68,-0.55,.27,1.55);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    }
+    .toggle-track.active .toggle-thumb { transform: translateX(20px); background: #0d0d1f; }
+
+    /* ================================
+       SCHOOL PAGE
+    ================================ */
+    .school-header {
+      background: linear-gradient(135deg, #2a4d8e 0%, #3b6dbf 60%, #5b8ee0 100%);
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 4px 20px rgba(42,77,142,0.22);
+    }
+    .header-inner {
+      max-width: 1140px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px;
+    }
+    .school-logo-wrap { display: flex; align-items: center; gap: 14px; }
+    .school-logo-img {
+      width: 46px; height: 46px;
+      background: transparent;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .school-logo-img img { width: 100%; height: 100%; object-fit: contain; }
+    .school-name {
+      font-family: 'Gmarket Sans', sans-serif;
+      font-size: 19px; font-weight: 700; color: #fff; line-height: 1.15;
+    }
+    .school-name span {
+      display: block; font-size: 11px;
+      font-weight: 300; opacity: 0.72; letter-spacing: 0.06em;
+    }
+
+    /* 네비게이션 — 데스크탑 */
+    .school-nav { display: flex; gap: 4px; }
+    .school-nav a {
+      color: rgba(255,255,255,0.82); text-decoration: none;
+      font-size: 13px; font-weight: 500;
+      padding: 8px 14px; border-radius: 50px; transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .school-nav a:hover { background: rgba(255,255,255,0.18); color: #fff; }
+
+    /* 햄버거 버튼 — 모바일에서만 표시 */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 6px;
+      margin-left: 8px;
+    }
+    .nav-hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: rgba(255,255,255,0.85); border-radius: 2px;
+      transition: all 0.28s;
+    }
+    /* 모바일 드롭다운 메뉴 */
+    .school-nav-mobile {
+      display: none;
+      flex-direction: column;
+      background: linear-gradient(180deg, #2a4d8e, #3b6dbf);
+      padding: 8px 16px 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .school-nav-mobile.open { display: flex; }
+    .school-nav-mobile a {
+      color: rgba(255,255,255,0.85); text-decoration: none;
+      font-size: 14px; font-weight: 500;
+      padding: 12px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-family: 'Gmarket Sans', sans-serif;
+      transition: color 0.2s;
+    }
+    .school-nav-mobile a:last-child { border-bottom: none; }
+    .school-nav-mobile a:hover { color: #fff; }
+
+    @media (max-width: 680px) {
+      .school-nav { display: none; }
+      .nav-hamburger { display: flex; }
+      .school-name { font-size: 16px; }
+      .school-name span { font-size: 10px; }
+    }
+
+    /* hero */
+    .school-hero {
+      background: linear-gradient(160deg, #eef3fc 0%, #dce8f8 50%, #e8f4ee 100%);
+      padding: 80px 24px 68px; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .school-hero::before {
+      content:''; position:absolute; top:-80px; right:-80px;
+      width:340px; height:340px; border-radius:50%;
+      background:radial-gradient(circle,rgba(91,142,224,0.16) 0%,transparent 70%);
+    }
+    .school-hero::after {
+      content:''; position:absolute; bottom:-60px; left:-40px;
+      width:260px; height:260px; border-radius:50%;
+      background:radial-gradient(circle,rgba(76,175,125,0.13) 0%,transparent 70%);
+    }
+    .hero-title {
+      font-family: 'Gmarket Sans', sans-serif;
+      font-size: clamp(36px,6vw,56px); font-weight: 700;
+      color: var(--school-blue-dark); line-height: 1.15; margin-bottom: 20px;
+    }
+    .hero-title em { font-style: normal; color: var(--school-blue); }
+    .hero-motto {
+      display: inline-block;
+      font-family: 'Gmarket Sans', sans-serif;
+      font-size: 15px; font-weight: 500;
+      color: var(--school-text-light); letter-spacing: 0.05em;
+      padding: 11px 30px;
+      background: rgba(255,255,255,0.72);
+      border-radius: 50px;
+      border: 1px solid rgba(59,109,191,0.18);
+      box-shadow: 0 2px 12px rgba(59,109,191,0.08);
+    }
+    .hero-motto em { font-style: normal; color: var(--school-blue); font-weight: 700; }
+
+    /* section */
+    .school-section { max-width:1140px; margin:0 auto; padding:64px 24px; }
+    .section-title-wrap { margin-bottom:40px; }
+    .section-eyebrow {
+      font-size:12px; font-weight:700; letter-spacing:0.14em;
+      color:var(--school-blue); font-family:'Gmarket Sans',sans-serif; margin-bottom:8px;
+    }
+    .section-title {
+      font-family:'Gmarket Sans',sans-serif;
+      font-size:28px; font-weight:700; color:var(--school-text); line-height:1.3;
+    }
+    .section-divider {
+      width:40px; height:4px;
+      background:linear-gradient(90deg,var(--school-blue),var(--school-green));
+      border-radius:4px; margin-top:12px;
+    }
+
+    /* 학교 소개 */
+    .school-intro-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    @media(max-width:760px){ .school-intro-grid{ grid-template-columns:1fr; } }
+    .intro-card {
+      background:var(--school-card); border-radius:var(--radius); padding:32px;
+      border:1.5px solid var(--school-border);
+      box-shadow:0 4px 18px rgba(59,109,191,0.06);
+      transition:transform 0.22s,box-shadow 0.22s;
+    }
+    .intro-card:hover { transform:translateY(-4px); box-shadow:0 10px 32px rgba(59,109,191,0.13); }
+    .intro-card-icon { font-size:30px; margin-bottom:14px; }
+    .intro-card h3 {
+      font-family:'Gmarket Sans',sans-serif; font-size:17px; font-weight:700;
+      color:var(--school-blue-dark); margin-bottom:10px;
+    }
+    .intro-card p { font-size:14px; line-height:1.8; color:var(--school-text-light); }
+    .intro-card ul { list-style:none; font-size:14px; color:var(--school-text-light); line-height:2; }
+    .intro-card ul li::before { content:'·'; color:var(--school-blue); font-weight:700; margin-right:6px; }
+
+    /* 학사일정 */
+    .schedule-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; }
+    .schedule-card {
+      background:var(--school-card); border-radius:var(--radius-sm); padding:18px;
+      border:1.5px solid var(--school-border); transition:all 0.2s;
+    }
+    .schedule-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(59,109,191,0.1); }
+    .schedule-month { font-family:'Gmarket Sans',sans-serif; font-size:13px; font-weight:700; color:var(--school-blue); margin-bottom:8px; }
+    .schedule-item { font-size:12.5px; color:var(--school-text-light); line-height:1.75; }
+    .schedule-item.empty { color:#c0c8d8; font-style:italic; }
+
+    /* 캐릭터 */
+    .chars-tabs { display:flex; gap:8px; margin-bottom:28px; flex-wrap:wrap; }
+    .chars-tab {
+      padding:8px 20px; border-radius:50px; border:1.5px solid var(--school-border);
+      background:#fff; font-size:13px; font-weight:500;
+      font-family:'Gmarket Sans',sans-serif; color:var(--school-text-light);
+      cursor:pointer; transition:all 0.2s;
+    }
+    .chars-tab.active,.chars-tab:hover { background:var(--school-blue); color:#fff; border-color:var(--school-blue); }
+    .chars-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(148px,1fr)); gap:16px; }
+    .chars-panel { display:none; }
+    .chars-panel.active { display:grid; }
+
+    .char-card {
+      background:var(--school-card); border-radius:var(--radius); padding:18px 14px 20px;
+      text-align:center; border:1.5px solid var(--school-border);
+      box-shadow:0 2px 12px rgba(59,109,191,0.06);
+      transition:all 0.22s; cursor:pointer;
+      display:block; color:inherit;
+    }
+    .char-card:hover { transform:translateY(-6px); box-shadow:0 12px 32px rgba(59,109,191,0.16); border-color:var(--school-blue-light); }
+    .char-photo {
+      width:72px; height:72px;
+      background:linear-gradient(135deg,#dce8f8,#e8f0fc);
+      border-radius:10px; margin:0 auto 12px;
+      border:1.5px dashed rgba(59,109,191,0.22);
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden; flex-shrink:0;
+    }
+    .char-photo img { width:100%; height:100%; object-fit:cover; border-radius:8px; }
+    .char-photo .photo-placeholder {
+      font-size:9px; color:rgba(107,124,147,0.45); text-align:center;
+      line-height:1.5; font-family:'Gmarket Sans',sans-serif; pointer-events:none;
+    }
+    .char-name { font-family:'Gmarket Sans',sans-serif; font-size:15px; font-weight:700; color:var(--school-text); margin-bottom:4px; }
+    .char-info { font-size:11px; color:var(--school-text-light); line-height:1.6; }
+    .char-tag { display:inline-block; margin-top:8px; background:rgba(59,109,191,0.1); color:var(--school-blue); font-size:10px; font-weight:700; padding:3px 10px; border-radius:50px; }
+    .char-tag.club-none { background:rgba(150,150,150,0.1); color:#999; }
+    .char-tag.club-council { background:rgba(228,112,58,0.12); color:var(--school-accent); }
+    .withdrawn-badge { display:inline-block; margin-top:6px; background:rgba(150,150,150,0.12); color:#888; font-size:10px; padding:2px 8px; border-radius:50px; }
+
+    /* 인물관계도 */
+    .relation-section { background:linear-gradient(135deg,#eef3fc,#e8f4ee); padding:64px 0; }
+    .relation-inner { max-width:1140px; margin:0 auto; padding:0 24px; }
+    .relation-img-wrap {
+      background:var(--school-card); border-radius:var(--radius);
+      border:1.5px solid var(--school-border); box-shadow:0 8px 32px rgba(59,109,191,0.1);
+      overflow:hidden; aspect-ratio:16/9;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .relation-placeholder { text-align:center; color:var(--school-text-light); }
+    .relation-placeholder span { font-size:52px; display:block; margin-bottom:14px; }
+    .relation-placeholder p { font-family:'Gmarket Sans',sans-serif; font-size:14px; font-weight:500; }
+
+    /* ===== 캐릭터챗 섹션 ===== */
+    .chat-section { padding:72px 0; background:#fff; }
+    .chat-inner { max-width:1140px; margin:0 auto; padding:0 24px; }
+    .chat-category { margin-bottom:56px; }
+    .chat-category:last-child { margin-bottom:0; }
+
+    .chat-cat-header { display:flex; align-items:center; gap:16px; margin-bottom:8px; }
+    .chat-cat-label {
+      font-family:'Gmarket Sans',sans-serif; font-size:11px; font-weight:700;
+      letter-spacing:0.12em; color:var(--school-blue);
+      background:rgba(59,109,191,0.09); border:1px solid rgba(59,109,191,0.18);
+      padding:5px 14px; border-radius:50px; flex-shrink:0;
+    }
+    .chat-cat-line { flex:1; height:1px; background:var(--school-border); }
+
+    .slider-hint {
+      font-size:11px; color:var(--school-text-light);
+      font-family:'Gmarket Sans',sans-serif;
+      margin-bottom:14px; opacity:0.55; display:flex; align-items:center; gap:5px;
+    }
+    .chat-slider {
+      display:flex; gap:18px;
+      overflow-x:auto; padding-bottom:14px;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      cursor:grab;
+      scrollbar-width:thin;
+      scrollbar-color:var(--school-border) transparent;
+    }
+    .chat-slider:active { cursor:grabbing; }
+    .chat-slider::-webkit-scrollbar { height:5px; }
+    .chat-slider::-webkit-scrollbar-thumb { background:var(--school-border); border-radius:4px; }
+
+    .chat-card {
+      flex:0 0 240px; background:var(--school-card); border-radius:var(--radius);
+      border:1.5px solid var(--school-border);
+      overflow:hidden; text-decoration:none; color:inherit;
+      scroll-snap-align:start;
+      transition:transform 0.22s,box-shadow 0.22s,border-color 0.22s;
+      display:flex; flex-direction:column;
+      user-select:none;
+    }
+    .chat-card:hover { transform:translateY(-5px); box-shadow:0 14px 36px rgba(59,109,191,0.14); border-color:var(--school-blue-light); }
+    .chat-thumb {
+      width:100%; aspect-ratio:1/1;
+      background:linear-gradient(135deg,#dce8f8,#e8f0fc);
+      border-bottom:1.5px dashed rgba(59,109,191,0.16);
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden; flex-shrink:0;
+    }
+    .chat-thumb img { width:100%; height:100%; object-fit:cover; }
+    .thumb-placeholder {
+      font-size:11px; color:rgba(107,124,147,0.42);
+      font-family:'Gmarket Sans',sans-serif; text-align:center; line-height:1.7;
+    }
+    .chat-card-body { padding:16px 18px 20px; flex:1; display:flex; flex-direction:column; }
+    .chat-card-title { font-family:'Gmarket Sans',sans-serif; font-size:15px; font-weight:700; color:var(--school-text); margin-bottom:7px; }
+    .chat-card-desc { font-size:12.5px; color:var(--school-text-light); line-height:1.75; flex:1; }
+    .chat-card-arrow {
+      display:inline-flex; align-items:center; gap:5px; margin-top:14px;
+      font-family:'Gmarket Sans',sans-serif; font-size:12px; font-weight:700;
+      color:var(--school-blue);
+    }
+    .chat-card-arrow svg { transition:transform 0.2s; }
+    .chat-card:hover .chat-card-arrow svg { transform:translateX(3px); }
+
+    /* footer */
+    .school-footer {
+      background:var(--school-blue-dark); color:rgba(255,255,255,0.55);
+      padding:36px 24px; text-align:center; font-size:12.5px; line-height:2;
+    }
+    .school-footer strong { color:rgba(255,255,255,0.85); }
+
+    /* ================================
+       CYBER PAGE
+    ================================ */
+    #page-cyber {
+      min-height:100vh; background:#030409; color:#c8ffe8;
+      font-family:'Share Tech Mono',monospace;
+      position:relative; overflow-x:hidden;
+    }
+    #page-cyber::before {
+      content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:repeating-linear-gradient(
+        0deg,transparent,transparent 2px,
+        rgba(0,255,200,0.02) 2px,rgba(0,255,200,0.02) 4px
+      );
+    }
+    .cyber-grid-bg {
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image:
+        linear-gradient(rgba(0,255,231,0.024) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,255,231,0.024) 1px,transparent 1px);
+      background-size:64px 64px;
+    }
+    .cyber-bg-deco { position:fixed; pointer-events:none; z-index:0; }
+    .cyber-bg-deco-1 {
+      top:5%; right:-100px; width:420px; height:420px; border-radius:50%;
+      background:radial-gradient(circle,rgba(0,255,231,0.055) 0%,transparent 70%);
+    }
+    .cyber-bg-deco-2 {
+      bottom:15%; left:-120px; width:500px; height:500px; border-radius:50%;
+      background:radial-gradient(circle,rgba(255,45,120,0.04) 0%,transparent 70%);
+    }
+
+    .cyber-toggle-wrap {
+      background:rgba(0,10,20,0.72) !important;
+      border:1px solid rgba(0,255,231,0.28) !important;
+      box-shadow:0 0 14px rgba(0,255,231,0.12) !important;
+    }
+    .cyber-toggle-wrap .mode-label { color:#00ffe7 !important; }
+
+    .cyber-header { position:relative; z-index:10; padding:32px 40px 0; max-width:1200px; margin:0 auto; }
+    .cyber-logo { display:flex; align-items:center; gap:14px; }
+    .cyber-logo-bracket { font-family:'Orbitron',monospace; font-size:11px; color:#00ffe7; letter-spacing:0.1em; opacity:0.6; }
+    .cyber-logo-name {
+      font-family:'Orbitron',monospace; font-size:20px; font-weight:900; color:#00ffe7;
+      text-shadow:0 0 16px rgba(0,255,231,0.55),0 0 40px rgba(0,255,231,0.18);
+      letter-spacing:0.06em;
+    }
+    .cyber-nav { display:flex; gap:8px; margin-top:24px; border-bottom:1px solid rgba(0,255,231,0.12); padding-bottom:12px; }
+    .cyber-nav a {
+      font-family:'Orbitron',monospace; font-size:10px; color:rgba(0,255,231,0.45);
+      text-decoration:none; letter-spacing:0.1em;
+      padding:6px 14px; border:1px solid transparent; border-radius:3px; transition:all 0.2s;
+    }
+    .cyber-nav a:hover { color:#00ffe7; border-color:rgba(0,255,231,0.35); background:rgba(0,255,231,0.05); text-shadow:0 0 8px rgba(0,255,231,0.45); }
+
+    .cyber-hero { position:relative; z-index:10; max-width:1200px; margin:0 auto; padding:72px 40px 40px; }
+    .cyber-tag {
+      font-family:'Orbitron',monospace; font-size:10px; color:#ff2d78;
+      letter-spacing:0.16em; border:1px solid rgba(255,45,120,0.35);
+      display:inline-block; padding:5px 14px; margin-bottom:22px;
+      text-shadow:0 0 8px rgba(255,45,120,0.45);
+    }
+    .cyber-title { font-family:'Orbitron',monospace; font-size:clamp(26px,4vw,46px); font-weight:900; line-height:1.15; color:#fff; margin-bottom:20px; }
+    .cyber-title .accent { color:#00ffe7; text-shadow:0 0 18px rgba(0,255,231,0.45); }
+    .cyber-title .accent2 { color:#ff2d78; text-shadow:0 0 18px rgba(255,45,120,0.35); }
+    .cyber-subtitle { font-size:12px; color:rgba(200,255,232,0.45); line-height:2.1; max-width:480px; letter-spacing:0.03em; }
+
+    .glitch { position:relative; display:inline-block; }
+    .glitch::before,.glitch::after { content:attr(data-text); position:absolute; top:0; left:0; width:100%; height:100%; }
+    .glitch::before { animation:glitch1 4s infinite; clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%); transform:translate(-2px); color:#ff2d78; }
+    .glitch::after  { animation:glitch2 4s infinite; clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%); transform:translate(2px);  color:#00ffe7; }
+    @keyframes glitch1 { 0%,88%,100%{transform:translate(-2px);opacity:0} 90%{opacity:1;transform:translate(-4px)} 93%{transform:translate(3px)} 95%{opacity:0} }
+    @keyframes glitch2 { 0%,84%,100%{transform:translate(2px);opacity:0}  86%{opacity:1;transform:translate(4px)}  89%{transform:translate(-2px)} 91%{opacity:0} }
+
+    .cyber-section { max-width:1200px; margin:0 auto; padding:56px 40px; position:relative; z-index:10; }
+    .cyber-section-header { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
+    .cyber-section-line { flex:1; height:1px; background:linear-gradient(90deg,rgba(0,255,231,0.28),transparent); }
+    .cyber-section-title { font-family:'Orbitron',monospace; font-size:13px; font-weight:700; color:#00ffe7; letter-spacing:0.14em; text-shadow:0 0 10px rgba(0,255,231,0.35); }
+
+    .cyber-slider-hint { font-size:10px; color:rgba(0,255,231,0.28); font-family:'Orbitron',monospace; letter-spacing:0.08em; margin-bottom:14px; }
+
+    .cyber-setting-slider {
+      display:flex; gap:20px;
+      overflow-x:auto; padding-bottom:12px;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch; cursor:grab;
+      scrollbar-width:thin; scrollbar-color:rgba(0,255,231,0.18) transparent;
+    }
+    .cyber-setting-slider:active { cursor:grabbing; }
+    .cyber-setting-slider::-webkit-scrollbar { height:4px; }
+    .cyber-setting-slider::-webkit-scrollbar-thumb { background:rgba(0,255,231,0.18); border-radius:4px; }
+
+    .cyber-setting-card {
+      flex:0 0 300px; border:1px solid rgba(0,255,231,0.14); border-radius:4px;
+      padding:26px; background:rgba(0,255,231,0.02);
+      position:relative; scroll-snap-align:start; transition:all 0.25s; user-select:none;
+    }
+    .cyber-setting-card:hover { border-color:rgba(0,255,231,0.38); background:rgba(0,255,231,0.05); box-shadow:0 0 22px rgba(0,255,231,0.07); }
+    .cyber-setting-card::after { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:linear-gradient(180deg,#00ffe7,transparent); opacity:0.45; }
+    .cyber-setting-card.pink-accent::after   { background:linear-gradient(180deg,#ff2d78,transparent); }
+    .cyber-setting-card.yellow-accent::after { background:linear-gradient(180deg,#ffe600,transparent); }
+    .cyber-card-label { font-size:9px; letter-spacing:0.15em; color:#00ffe7; margin-bottom:12px; opacity:0.55; }
+    .cyber-card-label.pink   { color:#ff2d78; }
+    .cyber-card-label.yellow { color:#ffe600; }
+    .cyber-card-title { font-family:'Orbitron',monospace; font-size:15px; font-weight:700; color:#fff; margin-bottom:12px; line-height:1.35; }
+    .cyber-card-text { font-size:12px; color:rgba(200,255,232,0.45); line-height:1.9; letter-spacing:0.02em; }
+
+    /* cyber chat */
+    .cyber-chat-section { max-width:1200px; margin:0 auto; padding:56px 40px 80px; position:relative; z-index:10; }
+    .cyber-chat-intro p { font-size:11px; color:rgba(200,255,232,0.32); line-height:1.9; letter-spacing:0.04em; margin-bottom:12px; }
+
+    .cyber-chat-slider {
+      display:flex; gap:20px;
+      overflow-x:auto; padding-bottom:14px;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch; cursor:grab;
+      scrollbar-width:thin; scrollbar-color:rgba(0,255,231,0.18) transparent;
+    }
+    .cyber-chat-slider:active { cursor:grabbing; }
+    .cyber-chat-slider::-webkit-scrollbar { height:4px; }
+    .cyber-chat-slider::-webkit-scrollbar-thumb { background:rgba(0,255,231,0.18); border-radius:4px; }
+
+    .cyber-chat-card {
+      flex:0 0 250px; border:1px solid rgba(0,255,231,0.14); background:rgba(0,255,231,0.02);
+      text-decoration:none; color:inherit; scroll-snap-align:start;
+      transition:all 0.25s; display:flex; flex-direction:column;
+      overflow:hidden; user-select:none;
+    }
+    .cyber-chat-card:hover { border-color:rgba(0,255,231,0.42); background:rgba(0,255,231,0.05); box-shadow:0 0 24px rgba(0,255,231,0.1); transform:translateY(-4px); }
+    .cyber-thumb {
+      width:100%; aspect-ratio:1/1; background:rgba(0,255,231,0.03);
+      border-bottom:1px solid rgba(0,255,231,0.1);
+      display:flex; align-items:center; justify-content:center; overflow:hidden;
+    }
+    .cyber-thumb img { width:100%; height:100%; object-fit:cover; }
+    .cyber-thumb-placeholder { font-size:10px; color:rgba(0,255,231,0.22); font-family:'Orbitron',monospace; text-align:center; line-height:1.7; letter-spacing:0.05em; }
+    .cyber-chat-body { padding:18px 18px 20px; flex:1; display:flex; flex-direction:column; }
+    .cyber-chat-card-title { font-family:'Orbitron',monospace; font-size:12px; font-weight:700; color:#c8ffe8; margin-bottom:8px; line-height:1.35; }
+    .cyber-chat-card-desc { font-size:11px; color:rgba(200,255,232,0.38); line-height:1.85; flex:1; }
+    .cyber-chat-arrow { display:inline-flex; align-items:center; gap:5px; margin-top:14px; font-family:'Orbitron',monospace; font-size:10px; color:#00ffe7; letter-spacing:0.08em; }
+    .cyber-chat-card:hover .cyber-chat-arrow { text-shadow:0 0 8px rgba(0,255,231,0.5); }
+
+    .cyber-footer {
+      position:relative; z-index:10; max-width:1200px; margin:0 auto;
+      padding:28px 40px; border-top:1px solid rgba(0,255,231,0.09);
+      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+    }
+    .cyber-footer-text { font-size:10px; color:rgba(0,255,231,0.28); letter-spacing:0.08em; }
+    .blink { animation:blink 1.1s step-start infinite; }
+    @keyframes blink { 50%{opacity:0} }
+
+    /* ===========================
+       PAGE TRANSITIONS
+    =========================== */
+    @keyframes dissolveOut {
+      from { opacity:1; filter:blur(0px) brightness(1); }
+      to   { opacity:0; filter:blur(5px) brightness(1.1); }
+    }
+    @keyframes cyberRiseIn {
+      0%   { opacity:0; transform:translateY(20px); filter:blur(4px); }
+      60%  { opacity:1; filter:blur(0); }
+      100% { opacity:1; transform:translateY(0); filter:blur(0); }
+    }
+    @keyframes schoolRiseBack {
+      0%   { opacity:0; transform:translateY(-18px); filter:blur(3px); }
+      100% { opacity:1; transform:translateY(0); filter:blur(0); }
+    }
+    .anim-dissolve-out   { animation:dissolveOut   0.42s ease forwards; }
+    .anim-cyber-in       { animation:cyberRiseIn   0.65s cubic-bezier(0.16,1,0.3,1) forwards; }
+    .anim-school-back    { animation:schoolRiseBack 0.58s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+    /* scroll reveal */
+    .reveal { opacity:0; transform:translateY(26px); transition:opacity 0.55s ease,transform 0.55s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    /* ===========================
+       CHARACTER MODAL
+    =========================== */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 10000;
+      background: rgba(20, 30, 55, 0.52);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.28s ease;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    /* 가로형 박스 */
+    .modal-box {
+      background: #fff; border-radius: 20px;
+      width: 100%; max-width: 620px;
+      box-shadow: 0 20px 56px rgba(42,77,142,0.18);
+      overflow: hidden;
+      display: flex; flex-direction: row;
+      transform: translateY(16px) scale(0.97);
+      transition: transform 0.32s cubic-bezier(0.16,1,0.3,1);
+      max-height: 90vh;
+    }
+    .modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
+
+    /* 왼쪽: 정사각형 사진 */
+    .modal-photo-wrap {
+      width: 220px; min-width: 220px;
+      aspect-ratio: 1/1;
+      background: linear-gradient(135deg, #dce8f8, #e8f0fc);
+      overflow: hidden; position: relative; flex-shrink: 0;
+      align-self: stretch;
+    }
+    .modal-photo-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block;
+    }
+
+    /* 닫기 버튼 — 박스 오른쪽 상단 */
+    .modal-close {
+      position: absolute; top: 14px; right: 14px;
+      width: 32px; height: 32px;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(6px);
+      border-radius: 50%; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; color: var(--school-text);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: background 0.18s;
+      z-index: 1;
+    }
+    .modal-close:hover { background: #fff; }
+
+    /* 오른쪽: 정보 */
+    .modal-body {
+      padding: 28px 26px 26px;
+      flex: 1; overflow-y: auto;
+      display: flex; flex-direction: column;
+      gap: 0;
+    }
+
+    .modal-name {
+      font-family: 'Gmarket Sans', sans-serif;
+      font-size: 22px; font-weight: 700;
+      color: var(--school-text); margin-bottom: 8px;
+    }
+    .modal-grade-tag {
+      display: inline-block;
+      font-family: 'Gmarket Sans', sans-serif;
+      font-size: 10px; font-weight: 700;
+      color: var(--school-blue);
+      background: rgba(59,109,191,0.09);
+      border: 1px solid rgba(59,109,191,0.2);
+      padding: 3px 11px; border-radius: 50px;
+      margin-bottom: 18px;
+    }
+    .modal-grade-tag.tag-council { background:rgba(228,112,58,0.1); color:var(--school-accent); border-color:rgba(228,112,58,0.2); }
+    .modal-grade-tag.tag-none    { background:rgba(150,150,150,0.1); color:#999; border-color:rgba(150,150,150,0.18); }
+    .modal-grade-tag.tag-special { background:rgba(150,150,150,0.1); color:#999; border-color:rgba(150,150,150,0.18); }
+
+    .modal-divider { height: 1px; background: var(--school-border); margin-bottom: 18px; }
+
+    .modal-info-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+    .modal-info-row { display: flex; align-items: baseline; gap: 10px; }
+    .modal-info-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      color: var(--school-text-light); font-family: 'Gmarket Sans', sans-serif;
+      text-transform: uppercase; flex-shrink: 0; width: 44px;
+    }
+    .modal-info-value { font-size: 13.5px; color: var(--school-text); line-height: 1.5; }
+
+    .modal-appearances { margin-top: 4px; }
+    .modal-appearances-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      color: var(--school-text-light); font-family: 'Gmarket Sans', sans-serif;
+      text-transform: uppercase; margin-bottom: 9px;
+    }
+    .modal-appearances-tags { display: flex; gap: 7px; flex-wrap: wrap; }
+    .modal-app-tag {
+      display: inline-block;
+      background: var(--school-bg); border: 1.5px solid var(--school-border);
+      color: var(--school-text); font-size: 11.5px;
+      padding: 4px 11px; border-radius: 50px;
+      transition: all 0.18s;
+    }
+    .modal-app-tag:hover { border-color: var(--school-blue); color: var(--school-blue); }
+
+    /* 모바일: 세로 유지하되 사진 높이 조절 */
+    @media(max-width: 520px) {
+      .modal-box { flex-direction: column; max-height: 88vh; }
+      .modal-photo-wrap { width: 100%; min-width: unset; aspect-ratio: 3/2; }
+      .modal-close { top: 10px; right: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== TOGGLE ===== -->
+<div class="mode-toggle-wrap" id="modeToggle" onclick="toggleMode()">
+  <span class="mode-label" id="modeLabel">다크 모드</span>
+  <div class="toggle-track" id="toggleTrack">
+    <div class="toggle-thumb"></div>
+  </div>
+</div>
+
+
+<!-- ===================================
+     SCHOOL PAGE
+=================================== -->
+<div id="page-school">
+
+  <header class="school-header">
+    <div class="header-inner">
+      <div class="school-logo-wrap">
+        <div class="school-logo-img">
+          <img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/hyeyumlogo_nobg.webp" alt="혜윰고 로고">
+        </div>
+        <div class="school-name">
+          혜윰고등학교
+          <span>HYEYUM HIGH SCHOOL · 공립 일반계 고등학교</span>
+        </div>
+      </div>
+      <!-- 데스크탑 네비 -->
+      <nav class="school-nav">
+        <a href="#intro">학교 소개</a>
+        <a href="#characters">캐릭터</a>
+        <a href="#relations">인물관계도</a>
+        <a href="#chat">캐릭터챗</a>
+      </nav>
+      <!-- 모바일 햄버거 버튼 -->
+      <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileNav()" aria-label="메뉴">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <!-- 모바일 드롭다운 -->
+    <nav class="school-nav-mobile" id="navMobile">
+      <a href="#intro" onclick="closeMobileNav()">학교 소개</a>
+      <a href="#characters" onclick="closeMobileNav()">캐릭터</a>
+      <a href="#relations" onclick="closeMobileNav()">인물관계도</a>
+      <a href="#chat" onclick="closeMobileNav()">캐릭터챗</a>
+    </nav>
+  </header>
+
+  <section class="school-hero">
+    <h1 class="hero-title">생각하는 학생,<br><em>혜윰고등학교</em></h1>
+    <div class="hero-motto">
+      꿈을 빚는 혜윰, <em>미래를 여는 우리</em>
+    </div>
+  </section>
+
+  <!-- 학교 소개 -->
+  <section class="school-section" id="intro">
+    <div class="section-title-wrap">
+      <div class="section-eyebrow">ABOUT</div>
+      <h2 class="section-title">학교 소개</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="school-intro-grid">
+      <div class="intro-card reveal">
+        <div class="intro-card-icon">🏫</div>
+        <h3>혜윰고등학교</h3>
+        <p>도심 한복판, 어디에나 있을 것 같은 그 학교. 공립 일반계 남녀공학으로 각 학년 12개 반, 총 36학급이 운영됩니다. 특별히 대단하지도 않고, 그렇다고 허름하지도 않은 — 딱 '평범한 고등학교'의 느낌을 간직한 곳입니다.</p>
+      </div>
+      <div class="intro-card reveal" style="transition-delay:.08s">
+        <div class="intro-card-icon">📋</div>
+        <h3>교내 조직</h3>
+        <ul>
+          <li>혜윰고등학교 학생회 — 매년 3월에 조직되는, 혜윰고 학생자치활동의 중심부.</li>
+          <li>상설 동아리 — 학교로부터 활동 지원을 받는 교내 동아리. (방송부, 댄스부, 도서부, 관악부, 과학실험부, 축구부)</li>
+          <li>학생 자율 동아리 — 모든 것이 학생들의 재량에 맏겨져있는 교내 동아리. (연애소설 실험반, 비라이트, 독서토론반, 사진촬영반, 드로잉반 외 다수)</li>
+        </ul>
+      </div>
+           <div class="intro-card reveal" style="transition-delay:.24s">
+        <div class="intro-card-icon">💡</div>
+        <h3>동아리 활동에 대해...</h3>
+        <p>혜윰고등학교에서 동아리 활동은 선택입니다. 참여하면 생활기록부에 기록되고, 참여하지 않는다고 큰 불이익은 없지만 — 교사들 중 일부는 곱지 않은 시선을 보내기도 합니다. 3년 내내 동아리 없이 버티는 학생도 꽤 있습니다.</p>
+      </div>
+      <div class="intro-card reveal" style="transition-delay:.16s">
+        <div class="intro-card-icon">🕰️</div>
+        <h3>하루 일과</h3></h3></h3>
+        <ul>
+          <li>AM 8:40 — 아침조회</li>
+          <li>AM 9:00 ~ AM 9:50 — 1교시</li>
+          <li>AM 10:00 ~ AM 10:50 — 2교시</li>
+          <li>AM 11:00 ~ AM 11:50 — 3교시</li>
+          <li>AM 12:00 ~ PM 12:50 — 4교시</li>
+          <li>PM 12:50 ~ PM 1:50 — 점심시간</li>
+          <li>PM 1:50 ~ PM 2:40 — 5교시</li>
+          <li>PM 2:50 ~ PM 3:40 — 6교시</li>
+          <li>PM 3:40 ~ PM 4:00 — 청소시간</li>
+          <li>PM 4:00 ~ PM 4:50 — 7교시</li>
+          <li>PM 4:50 — 종례</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 학사일정 -->
+  <section style="background:linear-gradient(135deg,#eef3fc,#f4f7fc);padding:56px 0;">
+    <div class="school-section" style="padding-top:0;padding-bottom:0;">
+      <div class="section-title-wrap">
+        <div class="section-eyebrow">SCHEDULE</div>
+        <h2 class="section-title">연간 학사 일정</h2>
+        <div class="section-divider"></div>
+      </div>
+      <div class="schedule-grid">
+        <div class="schedule-card reveal"><div class="schedule-month">3월</div><div class="schedule-item">입학식 / 1학기 학급 임원 선거<br>학생회장·부회장 선거<br>학생회 조직 / 상설 동아리 조직</div></div>
+        <div class="schedule-card reveal" style="transition-delay:.05s"><div class="schedule-month">4월</div><div class="schedule-item empty">특별 일정 없음</div></div>
+        <div class="schedule-card reveal" style="transition-delay:.1s"><div class="schedule-month">5월</div><div class="schedule-item">1학기 중간고사</div></div>
+        <div class="schedule-card reveal" style="transition-delay:.15s"><div class="schedule-month">6월</div><div class="schedule-item empty">특별 일정 없음</div></div>
+        <div class="schedule-card reveal" style="transition-delay:.2s"><div class="schedule-month">7월</div><div class="schedule-item">1학기 기말고사<br>방학 전 레크리에이션 행사<br>🌞 여름방학</div></div>
+        <div class="schedule-card reveal" style="transition-delay:.25s"><div class="schedule-month">8월</div><div class="schedule-item">개학<br>2학기 학급 임원 선거</div></div>
+        <div class="schedule-card reveal" style="transition-delay:.3s"><div class="schedule-month">9월</div><div class="schedule-item empty">특별 일정 없음</div></div>
+        <div class="schedule-card reveal" style="transition-delay:.35s"><div class="schedule-month">10월</div><div class="schedule-item">2학기 중간고사<br>🏃 혜윰 운동회</div></div>
+        <div class="schedule-card reveal" style="transition-delay:.4s"><div class="schedule-month">11월</div><div class="schedule-item">📣 수능 응원제</div></div>
+        <div class="schedule-card reveal" style="transition-delay:.45s"><div class="schedule-month">12월</div><div class="schedule-item">2학기 기말고사<br>🎉 혜윰제<br>❄️ 겨울방학</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 캐릭터 소개 -->
+  <section class="school-section" id="characters">
+    <div class="section-title-wrap">
+      <div class="section-eyebrow">CHARACTERS</div>
+      <h2 class="section-title">캐릭터 소개</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="chars-tabs">
+      <button class="chars-tab active" onclick="switchTab(this,'grade1')">1학년</button>
+      <button class="chars-tab" onclick="switchTab(this,'grade2')">2학년</button>
+      <button class="chars-tab" onclick="switchTab(this,'grade3')">3학년</button>
+      <button class="chars-tab" onclick="switchTab(this,'gradeX')">기타</button>
+    </div>
+    <!-- 1학년 -->
+    <div class="chars-grid chars-panel active" id="grade1">
+      <div class="char-card" onclick="openModal(this,'한성우','1학년 1반','없음','none','#소심 #겁많음 #순수','혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD05.webp" alt="한성우"></div><div class="char-name">한성우</div><div class="char-info">1학년 1반</div><span class="char-tag club-none">동아리 없음</span></div>
+      <div class="char-card" onclick="openModal(this,'서윤지','1학년 1반','관악부','club','#예절 #온화 #교양있음','혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD27.webp" alt="서윤지"></div><div class="char-name">서윤지</div><div class="char-info">1학년 1반</div><span class="char-tag">관악부</span></div>
+      <div class="char-card" onclick="openModal(this,'김재휘','1학년 3반','연애소설 실험반','club','#차분 #배려 # 다정','나를 사랑해주는 사람, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD8.webp" alt="김재휘"></div><div class="char-name">김재휘</div><div class="char-info">1학년 3반</div><span class="char-tag">연애소설 실험반</span></div>
+      <div class="char-card" onclick="openModal(this,'공은혁','1학년 3반','방송부','club','#능글 #무례 #음흉','밴드부 vs 방송부, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD23.webp" alt="공은혁"></div><div class="char-name">공은혁</div><div class="char-info">1학년 3반</div><span class="char-tag">방송부</span></div>
+      <div class="char-card" onclick="openModal(this,'이미나','1학년 6반','연애소설 실험반','club','#발랄 #애교 #바보','나를 사랑해주는 사람, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD9.webp" alt="이미나"></div><div class="char-name">이미나</div><div class="char-info">1학년 6반</div><span class="char-tag">연애소설 실험반</span></div>
+      <div class="char-card" onclick="openModal(this,'안서영','1학년 6반','비라이트','club','#감수성 #에민 #기분파','밴드부 vs 방송부, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD19.webp" alt="안서영"></div><div class="char-name">안서영</div><div class="char-info">1학년 6반</div><span class="char-tag">비라이트</span></div>
+      <div class="char-card" onclick="openModal(this,'문수현','1학년 8반','비라이트','club','#내향적 #겁많음 #부끄럼','밴드부 vs 방송부, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD18.webp" alt="문수현"></div><div class="char-name">문수현</div><div class="char-info">1학년 8반</div><span class="char-tag">비라이트</span></div>
+      <div class="char-card" onclick="openModal(this,'박동현','1학년 8반','과학실험부','club','#호기심 #4차원 #해맑음','박동현, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD04.webp" alt="박동현"></div><div class="char-name">박동현</div><div class="char-info">1학년 8반</div><span class="char-tag">과학실험부</span></div>
+      <div class="char-card" onclick="openModal(this,'오미연','1학년 13반','방송부','club','#악의 #다혈질 #유치함','밴드부 vs 방송부, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD24.webp" alt="오미연"></div><div class="char-name">오미연</div><div class="char-info">1학년 13반</div><span class="char-tag">방송부</span></div>
+    </div>
+    <!-- 2학년 -->
+    <div class="chars-grid chars-panel" id="grade2">
+      <div class="char-card" onclick="openModal(this,'한성훈','2학년 2반','사진촬영반','club','#반사회적 #심술궂음 #거침없음','한성훈, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD02.webp" alt="한성훈"></div><div class="char-name">한성훈</div><div class="char-info">2학년 2반</div><span class="char-tag">사진촬영반</span></div>
+      <div class="char-card" onclick="openModal(this,'신건우','2학년 2반','학생회','council','#귀차니즘 #뻔뻔함 #효율추구','밴드부 vs 방송부, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD26.webp" alt="신건우"></div><div class="char-name">신건우</div><div class="char-info">2학년 2반</div><span class="char-tag club-council">학생회</span></div>
+      <div class="char-card" onclick="openModal(this,'유로빈','2학년 3반','없음','none','#거만 #싸가지 #쑥맥','유로빈, 나를 사랑해주는 사람, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD6.webp" alt="유로빈"></div><div class="char-name">유로빈</div><div class="char-info">2학년 3반</div><span class="char-tag club-none">동아리 없음</span></div>
+      <div class="char-card" onclick="openModal(this,'정민호','2학년 3반','연애소설 실험반','club','#마이웨이 #까불거림 #능글','나를 사랑해주는 사람, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD10.webp" alt="정민호"></div><div class="char-name">정민호</div><div class="char-info">2학년 3반</div><span class="char-tag">연애소설 실험반</span></div>
+      <div class="char-card" onclick="openModal(this,'유세아','2학년 5반','드로잉반','club','#조용 #현실적 #비관론자','유세아, 나를 사랑해주는 사람, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD01.webp" alt="유세아"></div><div class="char-name">유세아</div><div class="char-info">2학년 5반</div><span class="char-tag">드로잉반</span></div>
+      <div class="char-card" onclick="openModal(this,'전소린','2학년 5반','비라이트','club','#유쾌 #친절 #정의로움','전소린, 밴드부 vs 방송부, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD17.webp" alt="전소린"></div><div class="char-name">전소린</div><div class="char-info">2학년 5반</div><span class="char-tag">비라이트</span></div>
+      <div class="char-card" onclick="openModal(this,'서윤재','2학년 9반','연애소설 실험반','club','#진지 #독설 #무뚝뚝','나를 사랑해주는 사람, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD12.webp" alt="서윤재"></div><div class="char-name">서윤재</div><div class="char-info">2학년 9반</div><span class="char-tag">연애소설 실험반</span></div>
+      <div class="char-card" onclick="openModal(this,'송지율','2학년 10반','학생회','council','#이타주의 #긍정적 #순수','밴드부 vs 방송부, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD25.webp" alt="송지율"></div><div class="char-name">송지율</div><div class="char-info">2학년 10반</div><span class="char-tag club-council">학생회</span></div>
+      <div class="char-card" onclick="openModal(this,'최주희','2학년 11반','방송부','club','#열혈 #완고함 #꾸밈없음','밴드부 vs 방송부, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD22.webp" alt="최주희"></div><div class="char-name">최주희</div><div class="char-info">2학년 11반</div><span class="char-tag">방송부</span></div>
+    </div>
+    <!-- 3학년 -->
+    <div class="chars-grid chars-panel" id="grade3">
+      <div class="char-card" onclick="openModal(this,'성나래','3학년 1반','연애소설 실험반','club','#얼빠짐 #공상적 #순수','나를 사랑해주는 사람, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD7.webp" alt="성나래"></div><div class="char-name">성나래</div><div class="char-info">3학년 1반</div><span class="char-tag">연애소설 실험반</span></div>
+      <div class="char-card" onclick="openModal(this,'노주하','3학년 1반','연애소설 실험반','club','#까칠 #힙스터 #완고함','나를 사랑해주는 사람, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD11.webp" alt="노주하"></div><div class="char-name">노주하</div><div class="char-info">3학년 1반</div><span class="char-tag">연애소설 실험반</span></div>
+      <div class="char-card" onclick="openModal(this,'나정현','3학년 4반','비라이트','club','#성숙함 #인내심 #겸손','밴드부 vs 방송부, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD20.webp" alt="나정현"></div><div class="char-name">나정현</div><div class="char-info">3학년 4반</div><span class="char-tag">비라이트</span></div>
+      <div class="char-card" onclick="openModal(this,'이설아','3학년 7반','독서토론반','club','#까칠 #도도 #매정','Infinitely, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD13.webp" alt="이설아"></div><div class="char-name">이설아</div><div class="char-info">3학년 7반</div><span class="char-tag">독서토론반</span></div>
+      <div class="char-card" onclick="openModal(this,'강준형','3학년 7반','없음','none','#무감적 #논리적 #수동적','Infinitely, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD14.webp" alt="강준형"></div><div class="char-name">강준형</div><div class="char-info">3학년 7반</div><span class="char-tag club-none">동아리 없음</span></div>
+      <div class="char-card" onclick="openModal(this,'구은빈','3학년 7반','댄스부','club','#친화력 #근자감 #뻔뻔','Infinitely, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD15.webp" alt="구은빈"></div><div class="char-name">구은빈</div><div class="char-info">3학년 7반</div><span class="char-tag">댄스부</span></div>
+      <div class="char-card" onclick="openModal(this,'오정우','3학년 7반','축구부','club','#외향적 #활동적 #자아도취','Infinitely, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD16.webp" alt="오정우"></div><div class="char-name">오정우</div><div class="char-info">3학년 7반</div><span class="char-tag">축구부</span></div>
+      <div class="char-card" onclick="openModal(this,'고준호','3학년 12반','방송부','club','#야심만만 #겁없음 #의리','밴드부 vs 방송부, 혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD21.webp" alt="고준호"></div><div class="char-name">고준호</div><div class="char-info">3학년 12반</div><span class="char-tag">방송부</span></div>
+      <div class="char-card" onclick="openModal(this,'송지은','3학년 12반','도서부','club','#카리스마 #완벽주의 #예리함','혜윰제 3부작')"><div class="char-photo"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD28.webp" alt="송지은"></div><div class="char-name">송지은</div><div class="char-info">3학년 12반</div><span class="char-tag">도서부</span></div>
+    </div>
+    <!-- 기타 -->
+    <div class="chars-grid chars-panel" id="gradeX">
+      <div class="char-card" onclick="openModal(this,'주예린','19세 (고2 자퇴)','—','special','#자기애 #여유 #어른스러움','주예린, 혜윰제 3부작')"><div class="char-photo" style="filter:grayscale(0.4)"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/IDCARD03.webp" alt="주예린"></div><div class="char-name">주예린</div><div class="char-info">19세</div><span class="withdrawn-badge">고 2 자퇴</span></div>
+    </div>
+  </section>
+
+  <!-- 인물관계도 -->
+  <section class="relation-section" id="relations">
+    <div class="relation-inner">
+      <div class="section-title-wrap">
+        <div class="section-eyebrow">RELATIONS</div>
+        <h2 class="section-title">인물 관계도</h2>
+        <div class="section-divider"></div>
+      </div>
+      <div class="relation-img-wrap reveal">
+        <img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/hyeyum%20relationship.webp" alt="혜윰고 인물관계도" style="width:100%;height:100%;object-fit:contain;display:block;">
+      </div>
+    </div>
+  </section>
+
+  <!-- 캐릭터챗 -->
+  <section class="chat-section" id="chat">
+    <div class="chat-inner">
+      <div class="section-title-wrap" style="margin-bottom:48px;">
+        <div class="section-eyebrow">CHARACTER CHAT</div>
+        <h2 class="section-title">캐릭터챗 바로가기</h2>
+        <div class="section-divider"></div>
+      </div>
+
+      <!-- 1:1 롤플레잉 -->
+      <div class="chat-category">
+        <div class="chat-cat-header">
+          <span class="chat-cat-label">1:1 롤플레잉</span>
+          <div class="chat-cat-line"></div>
+        </div>
+        <p class="slider-hint">← 옆으로 밀어서 더 보기</p>
+        <div class="chat-slider" id="slider-rp">
+          <a class="chat-card" href="https://share.crack.wrtn.ai/u3nahdy">
+            <div class="chat-thumb"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/thumbnail/01.png" alt="썸네일"></div>
+            <div class="chat-card-body">
+              <div class="chat-card-title">유세아</div>
+              <div class="chat-card-desc">말할 수 없는 비밀을 품은 신비주의 전학생.</div>
+              <span class="chat-card-arrow">바로가기 <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M7 3.5l2.5 2.5L7 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </a>
+          <a class="chat-card" href="https://share.crack.wrtn.ai/a6xkmje">
+            <div class="chat-thumb"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/thumbnail/02.png" alt="썸네일"></div>
+            <div class="chat-card-body">
+              <div class="chat-card-title">유로빈</div>
+              <div class="chat-card-desc">싸가지 없는 도련님이, 내 앞에서만 부끄럼쟁이가 된다.</div>
+              <span class="chat-card-arrow">바로가기 <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M7 3.5l2.5 2.5L7 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </a>
+          <a class="chat-card" href="https://share.crack.wrtn.ai/7riat5">
+            <div class="chat-thumb"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/thumbnail/03.png" alt="썸네일"></div>
+            <div class="chat-card-body">
+              <div class="chat-card-title">주예린</div>
+              <div class="chat-card-desc">매일 밤마다 교복을 입은 채 오락실에 앉아있는 의문의 선배.</div>
+              <span class="chat-card-arrow">바로가기 <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M7 3.5l2.5 2.5L7 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </a>
+          <a class="chat-card" href="https://share.crack.wrtn.ai/jl1b4q">
+            <div class="chat-thumb"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/thumbnail/04.webp" alt="썸네일"></div>
+            <div class="chat-card-body">
+              <div class="chat-card-title">한성훈</div>
+              <div class="chat-card-desc">우리 학교 대표 양아치가 개과천선을 하고 싶어한다.</div>
+              <span class="chat-card-arrow">바로가기 <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M7 3.5l2.5 2.5L7 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </a>
+          <a class="chat-card" href="https://share.crack.wrtn.ai/nfh2e3">
+            <div class="chat-thumb"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/thumbnail/05.webp" alt="썸네일"></div>
+            <div class="chat-card-body">
+              <div class="chat-card-title">전소린</div>
+              <div class="chat-card-desc">매일 점심시간마다, 학교 정원에서 기타 소리가 들린다.</div>
+              <span class="chat-card-arrow">바로가기 <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M7 3.5l2.5 2.5L7 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </a>
+          <a class="chat-card" href="https://share.crack.wrtn.ai/3lsu32l">
+            <div class="chat-thumb"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/thumbnail/06.webp" alt="썸네일"></div>
+            <div class="chat-card-body">
+              <div class="chat-card-title">박동현</div>
+              <div class="chat-card-desc">온갖 기행을 벌이고 다닌다는 과학 영재 신입생.</div>
+              <span class="chat-card-arrow">바로가기 <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M7 3.5l2.5 2.5L7 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- 시뮬레이션 -->
+      <div class="chat-category">
+        <div class="chat-cat-header">
+          <span class="chat-cat-label">시뮬레이션</span>
+          <div class="chat-cat-line"></div>
+        </div>
+        <p class="slider-hint">← 옆으로 밀어서 더 보기</p>
+        <div class="chat-slider" id="slider-sim">
+          <a class="chat-card" href="https://share.crack.wrtn.ai/n4ffwp">
+            <div class="chat-thumb"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/thumbnail/07.png" alt="썸네일"></div>
+            <div class="chat-card-body">
+              <div class="chat-card-title">나를 사랑해주는 사람</div>
+              <div class="chat-card-desc">내가 사랑하는 사람, 그리고 나를 사랑해주는 사람.</div>
+              <span class="chat-card-arrow">바로가기 <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M7 3.5l2.5 2.5L7 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </a>
+          <a class="chat-card" href="https://share.crack.wrtn.ai/51hsvz">
+            <div class="chat-thumb"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/thumbnail/08.webp" alt="썸네일"></div>
+            <div class="chat-card-body">
+              <div class="chat-card-title">Infinitely</div>
+              <div class="chat-card-desc">그럼에도, 당신의 사랑은 계속된다.</div>
+              <span class="chat-card-arrow">바로가기 <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M7 3.5l2.5 2.5L7 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </a>
+          <a class="chat-card" href="https://share.crack.wrtn.ai/i9yw6l">
+            <div class="chat-thumb"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/thumbnail/09.webp" alt="썸네일"></div>
+            <div class="chat-card-body">
+              <div class="chat-card-title">밴드부 vs 방송부</div>
+              <div class="chat-card-desc">만났다하면 싸우기 바쁜 두 동아리의 이야기</div>
+              <span class="chat-card-arrow">바로가기 <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M7 3.5l2.5 2.5L7 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="school-footer">
+    <strong>혜윰고등학교 시리즈 소개 페이지</strong><br>
+    이 페이지에 등장하는 인물 및 설정은 모두 창작된 허구입니다.<br>
+  </footer>
+</div>
+
+
+<!-- ===================================
+     CYBER PAGE
+=================================== -->
+<div id="page-cyber">
+  <div class="cyber-grid-bg"></div>
+  <div class="cyber-bg-deco cyber-bg-deco-1"></div>
+  <div class="cyber-bg-deco cyber-bg-deco-2"></div>
+
+  <header class="cyber-header">
+    <div class="cyber-logo">
+      <span class="cyber-logo-bracket">[ SYS::</span>
+      <span class="cyber-logo-name glitch" data-text="HYEYUM">PROGRAM</span>
+      <span class="cyber-logo-bracket">::ARCHIVE ]</span>
+    </div>
+    <nav class="cyber-nav">
+      <a href="#cyber-setting">HIDDEN_INFORMATION</a>
+      <a href="#cyber-chat">ACCESS_LINK</a>
+    </nav>
+  </header>
+
+  <section class="cyber-hero">
+    <div class="cyber-tag">▶ TOP SECRET - access restrictions</div>
+    <h1 class="cyber-title">
+      <span class="accent">PRO</span>GRAM<br>
+      <span class="accent2">PRO</span> JECT
+    </h1>
+    <p class="cyber-subtitle">
+      본 문서는 ▮▮연구소에서 기획 및 실행 중인 ⌈프로그램 프로젝트⌋의 <br>
+      전반적인 추진 공정 및 핵심 지표를 기록하고 있습니다. <br><br>
+      본 문서의 무단 복제, 배포 및 외부 유출을 엄격히 금하며,<br>
+      위반 시 연구소장의 직권에 따라 최고 수위의 내부 징계를 감수해야 함을 엄중히 통보합니다.
+    </p>
+  </section>
+
+  <!-- 숨겨진 설정 -->
+  <section class="cyber-section" id="cyber-setting">
+    <div class="cyber-section-header">
+      <span class="cyber-section-title">// HIDDEN_INFORMATION</span>
+      <div class="cyber-section-line"></div>
+    </div>
+    <p class="cyber-slider-hint">← SWIPE TO BROWSE</p>
+    <div class="cyber-setting-slider" id="cyber-slider-set">
+      <div class="cyber-setting-card">
+        <div class="cyber-card-label">INFORMATION_01 · 목표 설정</div>
+        <div class="cyber-card-title">혜윰고등학교의 ▮▮▮</div>
+        <div class="cyber-card-text">본 프로젝트의 최종적 지향점은 현실 물리 계층으로부터 완전히 독립된 ▮▮▮ ▮▮ ▮▮, '▮▮▮▮ ▮▮'를 ▮▮하는 데 있다. 이를 통해 혜윰고등학교 재학생 전원(약 1,000명)의 ▮▮ ▮▮▮를 완전 ▮▮함으로써, 물리적 제약을 탈피한 ▮▮적 ▮▮ ▮▮ ▮▮▮ 구현을 궁극적인 지배 목표로 설정한다.</div>
+      </div>
+      <div class="cyber-setting-card pink-accent">
+        <div class="cyber-card-label pink">INFORMATION_02 · 실행 계기</div>
+        <div class="cyber-card-title">연구소장 ▮▮▮의 기획</div>
+        <div class="cyber-card-text">본 프로젝트는 ▮▮연구소장(▮▮▮)의 직접 기획 및 최고 의사결정에 따라 착수되었으며, 전 과정은 연구소장의 엄격한 통제 및 실시간 감독 하에 운용되고 있다. 실험 대상(혜윰고등학교)의 확정 및 데이터 수집 구역 설정은 연구소장의 지시에 의한 결정임을 명시한다. </div>
+      </div>
+      <div class="cyber-setting-card yellow-accent">
+        <div class="cyber-card-label yellow">INFORMATION_03 · 정보 수집</div>
+        <div class="cyber-card-title">대상에 관한 정보 수집</div>
+        <div class="cyber-card-text">본 프로젝트의 실행 동력 확보를 위하여 연구소 소속 특수 요원들을 주기적으로 혜윰고등학교 반경 내에 투입하여 전방위적 정보 수집을 수행 중이며, 특히 실험 대상에 대한 ▮▮ ▮▮을 보유한 인원을 연구소 ▮▮▮▮으로 ▮▮ ▮▮함으로써 프로젝트 추진 동력을 비약적으로 가속화하였다.</div>
+      </div>
+      <div class="cyber-setting-card">
+        <div class="cyber-card-label">INFORMATION_04 · 한계점</div>
+        <div class="cyber-card-title">내부 의견 충돌</div>
+        <div class="cyber-card-text">본 프로젝트를 통제 및 감독 중인 연구소장(▮▮▮)과 프로젝트 실행의 핵심 인력으로 편성된 직원(▮▮▮) 간의 의견 충돌이 지속적으로 발생하고 있다. 다만, 발생한 모든 견해 차이에 대해서는 연구소장의 최종 판단을 전적으로 수용하여 추진하는 것으로 결정되었다.</div>
+      </div>
+      <div class="cyber-setting-card pink-accent">
+        <div class="cyber-card-label pink">INFORMATION_05 · 현황</div>
+        <div class="cyber-card-title">프로젝트 진행 현황</div>
+        <div class="cyber-card-text">본 프로젝트 실행의 핵심 요소인 '▮▮▮▮ ▮▮'의 ▮▮이 최종적으로 마무리되었다. 현재 ▮▮연구소 관리 인력 중 일부(▮▮▮, ▮▮▮, ▮▮▮, ▮▮▮, ▮▮▮)가 해당 ▮▮ ▮▮에 직접 투입되어 ▮▮▮ ▮▮▮ 및 ▮▮ ▮▮ ▮▮ 작업을 수행 중이다.</div>
+      </div>
+      <div class="cyber-setting-card">
+        <div class="cyber-card-label">INFORMATION_06 · 향후 계획</div>
+        <div class="cyber-card-title">프로젝트 실행</div>
+        <div class="cyber-card-text">본 프로젝트의 핵심 프로토콜 실행 일자는 ▮▮▮▮▮이 종료되는 '▮▮▮▮. ▮▮. ▮▮. AM 00:00(▮▮▮ 당일)'로 확정한다. 핵심 프로토콜 실행 ▮일 전 시점부터 혜윰고등학교 내부 시스템에 대한 ▮▮ ▮▮ 및 ▮▮▮를 개시하며, 실험 대상의 현황 ▮▮ 및 실시간 ▮▮는 연구소 내 전담 인원(▮▮▮)이 수행한다.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 사이버 챗 -->
+  <section class="cyber-chat-section" id="cyber-chat">
+    <div class="cyber-section-header">
+      <span class="cyber-section-title">// ACCESS_LINK</span>
+      <div class="cyber-section-line"></div>
+    </div>
+    <div class="cyber-chat-intro">
+      <p>아래 하이퍼링크 클릭 시, 본 프로젝트를 가상 실행할 수 있는 시뮬레이션으로 접속한다.</p>
+    </div>
+    <p class="cyber-slider-hint">← SWIPE TO BROWSE</p>
+    <div class="cyber-chat-slider" id="cyber-slider-chat">
+
+      <a class="cyber-chat-card" href="#">
+        <div class="cyber-thumb"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/thumbnail/10.webp" alt="썸네일"></div>
+        <div class="cyber-chat-body">
+          <div class="cyber-chat-card-title">혜윰제 준비 기간</div>
+          <div class="cyber-chat-card-desc">연말 축제를 앞두고 생긴 기괴한 일.</div>
+          <span class="cyber-chat-arrow">▶ CONNECT</span>
+        </div>
+      </a>
+
+      <a class="cyber-chat-card" href="#">
+        <div class="cyber-thumb"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/thumbnail/00.webp" alt="썸네일"></div>
+        <div class="cyber-chat-body">
+          <div class="cyber-chat-card-title">▮▮▮▮</div>
+          <div class="cyber-chat-card-desc">시뮬레이션 준비 중...</div>
+          <span class="cyber-chat-arrow">▶ CONNECT</span>
+        </div>
+      </a>
+
+      <a class="cyber-chat-card" href="#">
+        <div class="cyber-thumb"><img src="https://raw.githubusercontent.com/stillAstray/web/refs/heads/main/thumbnail/00.webp" alt="썸네일"></div>
+        <div class="cyber-chat-body">
+          <div class="cyber-chat-card-title">▮▮▮▮▮ ▮▮▮▮▮▮</div>
+          <div class="cyber-chat-card-desc">시뮬레이션 준비 중...</div>
+          <span class="cyber-chat-arrow">▶ CONNECT</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <footer class="cyber-footer">
+    <span class="cyber-footer-text">SYS:: PROGRAM_PROJECT · HM_LAB</span>
+    <span class="cyber-footer-text">STATUS: ONLINE <span class="blink">_</span></span>
+  </footer>
+</div>
+
+
+<!-- ===========================
+     CHARACTER MODAL
+=========================== -->
+<div class="modal-overlay" id="charModal" onclick="closeModalOnOverlay(event)">
+  <div class="modal-box">
+    <!-- 왼쪽: 정사각형 사진 -->
+    <div class="modal-photo-wrap">
+      <img id="modalImg" src="" alt="">
+    </div>
+    <!-- 오른쪽: 정보 -->
+    <div class="modal-body">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-name" id="modalName"></div>
+      <span class="modal-grade-tag" id="modalClubTag"></span>
+      <div class="modal-divider"></div>
+      <div class="modal-info-list">
+        <div class="modal-info-row">
+          <span class="modal-info-label">학급</span>
+          <span class="modal-info-value" id="modalGrade"></span>
+        </div>
+        <div class="modal-info-row">
+          <span class="modal-info-label">소속</span>
+          <span class="modal-info-value" id="modalClub"></span>
+        </div>
+        <div class="modal-info-row">
+          <span class="modal-info-label">성격</span>
+          <span class="modal-info-value" id="modalPersonality"></span>
+        </div>
+      </div>
+      <div class="modal-appearances">
+        <div class="modal-appearances-label">출연작</div>
+        <div class="modal-appearances-tags" id="modalAppearances"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* 모바일 네비 */
+  function toggleMobileNav() {
+    const nav = document.getElementById('navMobile');
+    const btn = document.getElementById('navHamburger');
+    const isOpen = nav.classList.toggle('open');
+    // 햄버거 → X 애니메이션
+    const spans = btn.querySelectorAll('span');
+    if (isOpen) {
+      spans[0].style.transform = 'translateY(7px) rotate(45deg)';
+      spans[1].style.opacity = '0';
+      spans[2].style.transform = 'translateY(-7px) rotate(-45deg)';
+    } else {
+      spans[0].style.transform = '';
+      spans[1].style.opacity = '';
+      spans[2].style.transform = '';
+    }
+  }
+  function closeMobileNav() {
+    const nav = document.getElementById('navMobile');
+    const btn = document.getElementById('navHamburger');
+    nav.classList.remove('open');
+    btn.querySelectorAll('span').forEach(s => { s.style.transform=''; s.style.opacity=''; });
+  }
+
+  let isCyber = false;
+  let transitioning = false;
+
+  /* ── 모달 ── */
+  function openModal(el, name, grade, club, clubType, personality, appearances) {
+    const imgEl = el.querySelector('.char-photo img');
+    document.getElementById('modalImg').src = imgEl ? imgEl.src : '';
+    document.getElementById('modalImg').alt = name;
+    document.getElementById('modalName').textContent = name;
+    document.getElementById('modalGrade').textContent = grade;
+    document.getElementById('modalClub').textContent = club;
+    document.getElementById('modalPersonality').textContent = personality;
+
+    const tag = document.getElementById('modalClubTag');
+    tag.textContent = club;
+    tag.className = 'modal-grade-tag';
+    if (clubType === 'council') tag.classList.add('tag-council');
+    else if (clubType === 'none') tag.classList.add('tag-none');
+    else if (clubType === 'special') { tag.classList.add('tag-special'); tag.textContent = '자퇴'; }
+
+    const appWrap = document.getElementById('modalAppearances');
+    appWrap.innerHTML = '';
+    if (appearances && appearances !== '—') {
+      appearances.split(',').forEach(a => {
+        const span = document.createElement('span');
+        span.className = 'modal-app-tag';
+        span.textContent = a.trim();
+        appWrap.appendChild(span);
+      });
+    } else {
+      appWrap.innerHTML = '<span style="font-size:13px;color:#bbb;">추후 업데이트 예정</span>';
+    }
+
+    const overlay = document.getElementById('charModal');
+    overlay.style.display = 'flex';
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    const overlay = document.getElementById('charModal');
+    overlay.classList.remove('open');
+    setTimeout(() => { overlay.style.display = 'none'; }, 300);
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOnOverlay(e) {
+    if (e.target === document.getElementById('charModal')) closeModal();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  function toggleMode() {
+    if (transitioning) return;
+    transitioning = true;
+
+    const track  = document.getElementById('toggleTrack');
+    const label  = document.getElementById('modeLabel');
+    const wrap   = document.getElementById('modeToggle');
+    const school = document.getElementById('page-school');
+    const cyber  = document.getElementById('page-cyber');
+
+    isCyber = !isCyber;
+
+    if (isCyber) {
+      track.classList.add('active');
+      wrap.classList.add('cyber-toggle-wrap');
+      label.textContent = '노멀 모드';
+
+      // school dissolves out
+      school.classList.add('anim-dissolve-out');
+      setTimeout(() => {
+        school.style.display = 'none';
+        school.classList.remove('anim-dissolve-out');
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        cyber.style.display = 'block';
+        cyber.classList.add('anim-cyber-in');
+        setTimeout(() => {
+          cyber.classList.remove('anim-cyber-in');
+          transitioning = false;
+        }, 700);
+      }, 400);
+
+    } else {
+      track.classList.remove('active');
+      wrap.classList.remove('cyber-toggle-wrap');
+      label.textContent = '다크 모드';
+      label.style.color = '';
+
+      cyber.classList.add('anim-dissolve-out');
+      setTimeout(() => {
+        cyber.style.display = 'none';
+        cyber.classList.remove('anim-dissolve-out');
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        school.style.display = 'block';
+        school.classList.add('anim-school-back');
+        setTimeout(() => {
+          school.classList.remove('anim-school-back');
+          transitioning = false;
+        }, 620);
+      }, 380);
+    }
+  }
+
+  /* 탭 전환 */
+  function switchTab(el, panelId) {
+    document.querySelectorAll('.chars-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.chars-panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById(panelId).classList.add('active');
+  }
+
+  /* 스크롤 reveal */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  /* 슬라이더 마우스 드래그 */
+  document.querySelectorAll('.chat-slider, .cyber-setting-slider, .cyber-chat-slider').forEach(slider => {
+    let isDown = false, startX = 0, scrollLeft = 0;
+    slider.addEventListener('mousedown', e => {
+      isDown = true;
+      startX = e.pageX - slider.offsetLeft;
+      scrollLeft = slider.scrollLeft;
+      e.preventDefault();
+    });
+    document.addEventListener('mouseup', () => { isDown = false; });
+    slider.addEventListener('mousemove', e => {
+      if (!isDown) return;
+      const x = e.pageX - slider.offsetLeft;
+      slider.scrollLeft = scrollLeft - (x - startX) * 1.15;
+    });
+    // prevent link clicks while dragging
+    slider.addEventListener('click', e => {
+      if (Math.abs(slider.scrollLeft - scrollLeft) > 4) e.preventDefault();
+    });
+  });
+</script>
+</body>
+</html>
